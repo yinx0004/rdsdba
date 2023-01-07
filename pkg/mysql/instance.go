@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	ConnectionFmt = "%s:%s@tcp(%s:%d)/?timeout=%s&tmp_table_size=2147483648&max_heap_table_size=2147483648&maxAllowedPacket=0"
+	ConnectionFmt = "%s:%s@tcp(%s:%d)/?timeout=%s&tmp_table_size=2147483648&max_heap_table_size=2147483648&max_execution_time=0&maxAllowedPacket=0"
 	SystemSchema  = " 'information_schema', 'innodb', 'mysql', 'performance_schema', 'sys' "
 	pingTimeout   = 5 * time.Second
 	connTimeout   = 10 * time.Second

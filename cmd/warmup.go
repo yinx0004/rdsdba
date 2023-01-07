@@ -67,7 +67,7 @@ func init() {
 	WarmupCmd.Flags().IntVarP(&cfg.MaxIdleConns, "max-idle-connection", "i", 50, "max number of idle mysql connections")
 	WarmupCmd.Flags().DurationVarP(&cfg.ConnMaxLifeTime, "connection-max-lifetime", "l", -1*time.Minute, "the maximum amount of time a connection may be reused, less than 0 means never timeout, support time duration [s|m|h], suggest keep default") // by default never timeout, for long-running queries
 	WarmupCmd.Flags().BoolVarP(&cfg.Debug, "debug", "D", false, "show debug level log")
-	WarmupCmd.Flags().StringSliceVarP(&skip, "skip", "s", nil, "skip code tables to let them stay on disk, comma separated format:schema_name1.table_name1,schema_name2.table_name2, whitespaces between comma is allowed ")
+	WarmupCmd.Flags().StringSliceVarP(&skip, "skip", "s", nil, "skip cold tables to let them stay on disk, comma separated format:schema_name1.table_name1,schema_name2.table_name2, whitespaces between comma is allowed ")
 	WarmupCmd.Flags().StringSliceVarP(&only, "only", "o", nil, "only load specific tables to memory, comma separated format:schema_name.table_name, schema_name2.table_name2, whitespaces between comma is allowed")
 	//WarmupCmd.Flags().DurationVarP(&cfg.Sleep, "sleep", "S", 1*time.Second, "sleep time, support time duration [s|m|h]")
 	WarmupCmd.MarkFlagsRequiredTogether("host", "user", "password")
