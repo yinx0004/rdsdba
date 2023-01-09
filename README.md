@@ -45,9 +45,9 @@ Flags:
   -o, --only strings                       only load specific tables to memory, comma separated format:schema_name.table_name, schema_name2.table_name2, whitespaces between comma is allowed
   -p, --password string                    mysql password
   -P, --port int                           mysql server port (default 3306)
-  -s, --skip strings                       skip code tables to let them stay on disk, comma separated format:schema_name1.table_name1,schema_name2.table_name2, whitespaces between comma is allowed
+  -s, --skip strings                       skip cold tables to let them stay on disk, comma separated format:schema_name1.table_name1,schema_name2.table_name2, whitespaces between comma is allowed
   -t, --thread int                         number of threads (default 20)
-  -u, --user string                        mysql user (default "admin")
+  -u, --user string                        mysql user (default "root")
 ```
 
 ### MySQL InnoDB Buffer Pool Warmup
