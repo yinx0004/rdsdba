@@ -61,7 +61,9 @@ func NewInstance(config Config) (*Instance, error) {
 
 	conn, err := i.Open()
 	if err != nil {
-		return nil, fmt.Errorf(ErrDBInitFailed.Error(), err)
+		logger.Error().Err(err).Msg("")
+		//return nil, fmt.Errorf(ErrDBInitFailed.Error(), err)
+		return nil, ErrDBInitFailed
 	}
 	i.DB = conn
 	return i, nil
@@ -134,4 +136,16 @@ func (i *Instance) GetUserTables(ctx context.Context) ([]Table, error) {
 		tables = append(tables, table)
 	}
 	return tables, nil
+}
+
+func (i *Instance) Stress(ctx context.Context, query string) (int64, error) {
+	rt, _, _, err := Query(ctx, i.DB, query)
+
+	if err != nil {
+		if !errors.Is(err, context.DeadlineExceeded) {
+			i.logger.Error().Err(err).Msg("")
+		}
+		return 0, err
+	}
+	return rt.Duration, nil
 }
