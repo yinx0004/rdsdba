@@ -18,11 +18,12 @@ limitations under the License.
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
 
-const version = "0.0.1"
+const version = "0.0.2"
 
 // RootCmd represents the base command when called without any subcommands
 var (
@@ -47,5 +48,14 @@ func Execute() {
 }
 
 func init() {
+	RootCmd.PersistentFlags().StringVarP(&cfg.DSN.Host, "host", "H", "localhost", "RDS host")
+	RootCmd.PersistentFlags().IntVarP(&cfg.DSN.Port, "port", "P", 3306, "RDS port")
+	RootCmd.PersistentFlags().StringVarP(&cfg.DSN.User, "user", "u", "root", "RDS user")
+	RootCmd.PersistentFlags().StringVarP(&cfg.DSN.Passwd, "password", "p", "", "RDS password")
+	RootCmd.PersistentFlags().IntVarP(&cfg.MaxOpenConns, "max-connection", "c", 50, "max number of open connections to RDS")
+	RootCmd.PersistentFlags().IntVarP(&cfg.MaxIdleConns, "max-idle-connection", "i", 50, "max number of idle connections to RDS")
+	RootCmd.PersistentFlags().DurationVarP(&cfg.ConnMaxLifeTime, "connection-max-lifetime", "l", -1*time.Minute, "the maximum amount of time a connection may be reused, less than 0 means never timeout, support time duration [s|m|h], suggest keep default") // by default never timeout, for long-running queries
+	RootCmd.PersistentFlags().BoolVarP(&cfg.Debug, "debug", "D", false, "show debug level log")
+	RootCmd.MarkFlagsRequiredTogether("host", "user", "password")
 
 }

@@ -27,7 +27,7 @@ func Query(ctx context.Context, db *sql.DB, sqlStmt string) (QueryResponseInfo, 
 	startTime := time.Now()
 	rows, err := db.QueryContext(ctx, sqlStmt)
 	endTime := time.Now()
-	duration := int64(endTime.Sub(startTime)) / 1000000 // second
+	duration := int64(endTime.Sub(startTime)) / 1000000 // millisecond
 	if err != nil {
 		errString := fmt.Sprint(err)
 		result = QueryResponseInfo{

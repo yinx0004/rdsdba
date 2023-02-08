@@ -18,12 +18,10 @@ limitations under the License.
 import (
 	"context"
 	"os"
-	"strconv"
-	"sync"
-	"time"
-
 	"rdsdba/internal"
 	"rdsdba/pkg/mysql"
+	"strconv"
+	"sync"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -58,19 +56,9 @@ speed up upcoming traffic.`,
 func init() {
 	RootCmd.AddCommand(WarmupCmd)
 
-	WarmupCmd.Flags().StringVarP(&cfg.DSN.Host, "host", "H", "localhost", "mysql host")
-	WarmupCmd.Flags().IntVarP(&cfg.DSN.Port, "port", "P", 3306, "mysql server port")
-	WarmupCmd.Flags().StringVarP(&cfg.DSN.User, "user", "u", "root", "mysql user")
-	WarmupCmd.Flags().StringVarP(&cfg.DSN.Passwd, "password", "p", "", "mysql password")
-	WarmupCmd.Flags().IntVarP(&cfg.Concurrency, "thread", "t", 20, "number of threads")
-	WarmupCmd.Flags().IntVarP(&cfg.MaxOpenConns, "max-connection", "c", 50, "max number of open mysql connections")
-	WarmupCmd.Flags().IntVarP(&cfg.MaxIdleConns, "max-idle-connection", "i", 50, "max number of idle mysql connections")
-	WarmupCmd.Flags().DurationVarP(&cfg.ConnMaxLifeTime, "connection-max-lifetime", "l", -1*time.Minute, "the maximum amount of time a connection may be reused, less than 0 means never timeout, support time duration [s|m|h], suggest keep default") // by default never timeout, for long-running queries
-	WarmupCmd.Flags().BoolVarP(&cfg.Debug, "debug", "D", false, "show debug level log")
+	WarmupCmd.Flags().IntVarP(&cfg.Concurrency, "thread", "t", 1, "number of threads")
 	WarmupCmd.Flags().StringSliceVarP(&skip, "skip", "s", nil, "skip cold tables to let them stay on disk, comma separated format:schema_name1.table_name1,schema_name2.table_name2, whitespaces between comma is allowed ")
 	WarmupCmd.Flags().StringSliceVarP(&only, "only", "o", nil, "only load specific tables to memory, comma separated format:schema_name.table_name, schema_name2.table_name2, whitespaces between comma is allowed")
-	//WarmupCmd.Flags().DurationVarP(&cfg.Sleep, "sleep", "S", 1*time.Second, "sleep time, support time duration [s|m|h]")
-	WarmupCmd.MarkFlagsRequiredTogether("host", "user", "password")
 	WarmupCmd.MarkFlagsMutuallyExclusive("skip", "only")
 }
 
@@ -107,6 +95,10 @@ func removeSkipTables(allUserTables []mysql.Table, skipTablesStr []string) ([]my
 }
 
 func run() error {
+	if cfg.Concurrency <= 0 {
+		cfg.Concurrency = 1
+	}
+
 	if cfg.Debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
@@ -119,11 +111,10 @@ func run() error {
 	defer cancel()
 
 	i, err := mysql.NewInstance(cfg)
-	defer i.DB.Close()
 	if err != nil {
 		logger.Fatal().Err(err).Msg("")
 	}
-
+	defer i.DB.Close()
 	logger.Info().Msg("Instance initialised")
 
 	switch {
